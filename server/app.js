@@ -1,0 +1,12 @@
+const express = require("express");
+const moiveRouter = require("./routers/userRouter");
+const chatRouter = require("./routers/chatRouter");
+const messageRouter = require("./routers/messageRouter");
+const globalErrorHandler = require("./controllers/globalErrorHandler");
+const app = express();
+app.use(express.json());
+app.use("/api/auth", moiveRouter);
+app.use("/api/chat", chatRouter);
+app.use("/api/message", messageRouter);
+app.use(globalErrorHandler);
+module.exports = app;
