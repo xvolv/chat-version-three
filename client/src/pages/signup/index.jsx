@@ -1,7 +1,8 @@
 import React from "react";
 import { useState } from "react";
-
+import { signupUser } from "./../../apiCalls/auth";
 import { Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const Signup = () => {
   const [user, setUser] = useState({
@@ -10,9 +11,19 @@ const Signup = () => {
     email: "",
     password: "",
   });
-  const onformSubmit = (event) => {
+  const onformSubmit = async (event) => {
     event.preventDefault();
-    console.log(user);
+    try {
+      const resData = await signupUser(user);
+
+      if (resData.status === "SUCCESS") {
+        toast.success(resData.message);
+      } else {
+        toast.error(resData.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
   return (
     <div className="container">
