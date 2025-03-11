@@ -14,7 +14,7 @@ const Login = () => {
     try {
       const resData = await loginUser(user);
       if (resData.status === "SUCCESS") {
-        toast.success(resData.token);
+        toast.success(resData.message);
         localStorage.setItem("token", resData.token);
         window.location.href = "/";
       } else {
