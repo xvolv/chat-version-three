@@ -18,12 +18,10 @@ const globalErrorHandler = (error, req, res, next) => {
   // Set defaults once
   error.statusCode = error.statusCode || 500;
   error.message = error.message || "Something went wrong";
-  console.log(process.env.NODE_ENV);
+
   if (process.env.NODE_ENV === "development") {
-   
     devError(res, error);
   } else {
-
     devError(res, error);
   }
 };

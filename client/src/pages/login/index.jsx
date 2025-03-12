@@ -2,8 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { loginUser } from "./../../apiCalls/auth";
 import { toast } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { showLoader, hideLoader } from "./../../redux/loaderSlice";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const [user, setUser] = useState({
     email: "",
     password: "",
@@ -12,7 +15,9 @@ const Login = () => {
     event.preventDefault();
     console.log(user);
     try {
+      dispatch(showLoader());
       const resData = await loginUser(user);
+      dispatch(hideLoader());
       if (resData.status === "SUCCESS") {
         toast.success(resData.message);
         localStorage.setItem("token", resData.token);
@@ -27,10 +32,11 @@ const Login = () => {
           errorMessage = resData.message || errorMessage;
         }
         console.log(resData);
-        console.log("reached here");
+
         toast.error(errorMessage);
       }
     } catch (error) {
+      dispatch(hideLoader());
       const res = "unexpected error occured, try again later please";
       console.log("it reached here,", error);
       toast.error(res);
