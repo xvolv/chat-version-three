@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import GetLoggedUser from "../users";
+import { GetLoggedUser } from "../users";
+import { GetAllUser } from "../users";
 import { useDispatch } from "react-redux";
 import { hideLoader, showLoader } from "../../redux/loaderSlice";
 import toast from "react-hot-toast";
-import { setUser } from "../../redux/userSlice";
+import { setUser, setAllUsers } from "../../redux/userSlice";
 
 const ProtectedRoute = ({ children }) => {
   const dispatch = useDispatch();
@@ -14,7 +15,6 @@ const ProtectedRoute = ({ children }) => {
 
   const getLoggedInUser = async () => {
     let resData;
-
     try {
       dispatch(showLoader());
       resData = await GetLoggedUser();
@@ -32,9 +32,30 @@ const ProtectedRoute = ({ children }) => {
       console.log(error);
     }
   };
+  const getAllUserList = async () => {
+    let resData;
+
+    try {
+      dispatch(showLoader());
+      resData = await GetAllUser();
+
+      dispatch(hideLoader());
+      if (resData.status === "SUCCESS") {
+        dispatch(setAllUsers(resData.users));
+      } else {
+        toast.error(resData.message);
+        navigate("/login");
+      }
+    } catch (error) {
+      dispatch(hideLoader());
+      navigate("/login");
+      console.log(error);
+    }
+  };
   useEffect(() => {
     if (localStorage.getItem("token")) {
       getLoggedInUser();
+      getAllUserList();
     } else {
       navigate("/login");
     }

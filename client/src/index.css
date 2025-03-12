@@ -221,3 +221,94 @@ i{
   vertical-align: middle;
   line-height: 40px;
 }
+
+
+
+/*******************************************************
+********CSS FOR SIDEBAR COMPONENT************************
+********************************************************/
+.app-sidebar{
+  width: 30%;
+  padding: 0px 20px;
+}
+
+
+
+/*******************************************************
+********CSS FOR SEARCH COMPONENT************************
+********************************************************/
+
+.user-search-area{
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.user-search-text{
+  width: 100%;
+  height: 40px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  color: #28282B;
+  border: #ddd 1px solid;
+}
+
+.user-search-btn{
+  position: absolute;
+  right: 10px;
+  font-size: 25px;
+  color: #e74c3c;
+}
+
+
+
+/*******************************************************
+********CSS FOR USER LIST COMPONENT*********************
+********************************************************/
+.filtered-user{
+  border-bottom: #ccc 1px solid;
+  padding: 10px 10px;
+  color: #28282B;
+  cursor: pointer;
+  background-color: white;
+}
+
+.filter-user-display{
+  display: flex;
+  flex-wrap: wrap;
+}
+.filter-user-details{
+  width: 60%;
+}
+.user-display-name{
+  padding: 1px 20px;
+  font-size: 16px;
+  font-weight: bold;
+}
+.user-display-email{
+  padding: 1px 20px;
+  font-size: 12px;
+}
+
+.user-default-profile-pic, .user-profile-image{
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #e74c3c;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 50px;
+}
+.user-start-chat{
+  padding: 10px 0px;
+}
+.user-start-chat-btn{
+  padding: 10px 5px;
+  border: none;
+  border-radius: 3px;
+  background-color: #e74c3c;
+  color: white;
+}
