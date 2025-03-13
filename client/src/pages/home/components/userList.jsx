@@ -6,6 +6,13 @@ import { setAllChats, setSelectedChat } from "../../../redux/userSlice";
 
 const UserList = ({ searchKey }) => {
   const dispatch = useDispatch();
+  const {
+    user: currentUser = null,
+    selectedChat = null,
+    allUsers = [],
+    allChats = [],
+  } = useSelector((state) => state.user) || {};
+
   const shortName = (user) => {
     return (
       user.firstName.charAt(0).toUpperCase() +
@@ -13,75 +20,22 @@ const UserList = ({ searchKey }) => {
     );
   };
 
-  const {
-    user: currentUser = null,
-    allUsers = [],
-    allChats = [],
-  } = useSelector((state) => state.user) || {};
-
-  // const startNewChat = async (searchedUserId) => {
-  //   let resData;
-  //   try {
-  //     dispatch(showLoader());
-  //     resData = await createNewChat([currentUser._id, searchedUserId]);
-  //     dispatch(hideLoader());
-  //     if (resData.status === "SUCCESS") {
-  //       toast.success(resData.message);
-  //       const newChat = resData.chat || resData;
-  //       console.log("Static, new chat is:", newChat); // Check this
-  //       const updateChat = [...allChats, newChat];
-  //       dispatch(setAllChats(updateChat));
-  //       dispatch(setSelectedChat(newChat));
-  //       console.log("Static, set this chat:", newChat); // Confirm it’s sent
-  //     }
-  //   } catch (error) {
-  //     dispatch(hideLoader());
-  //     toast.error(resData?.message || "Failed to start chat");
-  //     console.log(error, "Static, chat creation fucked up");
-  //   }
-  // };
-
-  // const startNewChat = async (searchedUserId) => {
-  //   let resData;
-  //   try {
-  //     dispatch(showLoader());
-  //     resData = await createNewChat([currentUser._id, searchedUserId]);
-  //     console.log("Static, raw API response:", resData); // What’s this?
-  //     dispatch(hideLoader());
-  //     if (resData.status === "SUCCESS") {
-  //       toast.success(resData.message);
-  //       const newChat = resData.chat || resData;
-  //       console.log("Static, new chat is:", newChat);
-  //       const updateChat = [...allChats, newChat];
-  //       dispatch(setAllChats(updateChat));
-  //       dispatch(setSelectedChat(newChat));
-  //       console.log("Static, set this chat:", newChat);
-  //     }
-  //   } catch (error) {
-  //     dispatch(hideLoader());
-  //     toast.error(resData?.message || "Failed to start chat");
-  //     console.log(error, "Static, chat creation fucked up");
-  //   }
-  // };
+  const isSelectedChat = (user) => {
+    return selectedChat?.members.some((m) => m._id === user._id) || false;
+  };
 
   const startNewChat = async (searchedUserId) => {
     let resData;
     try {
       dispatch(showLoader());
       resData = await createNewChat([currentUser._id, searchedUserId]);
-      console.log("Static, raw API response:", resData);
       dispatch(hideLoader());
       if (resData.status === "SUCCESS") {
         toast.success(resData.message);
-        const newChat = {
-          ...(resData.chat || resData),
-          createdAt: resData.chat?.createdAt || new Date().toISOString(), // Fake it if missing
-        };
-        console.log("Static, new chat is:", newChat);
+        const newChat = resData.chat || resData;
         const updateChat = [...allChats, newChat];
         dispatch(setAllChats(updateChat));
         dispatch(setSelectedChat(newChat));
-        console.log("Static, set this chat:", newChat);
       }
     } catch (error) {
       dispatch(hideLoader());
@@ -89,11 +43,12 @@ const UserList = ({ searchKey }) => {
       console.log(error, "Static, chat creation fucked up");
     }
   };
+
   const openChat = (selectedUserId) => {
     const chat = allChats.find(
       (chat) =>
-        chat.members.includes(currentUser._id) &&
-        chat.members.includes(selectedUserId)
+        chat.members.some((m) => m._id === currentUser._id) &&
+        chat.members.some((m) => m._id === selectedUserId)
     );
     if (chat) {
       dispatch(setSelectedChat(chat));
@@ -103,20 +58,25 @@ const UserList = ({ searchKey }) => {
   return allUsers
     .filter((user) => {
       const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+      const hasChat = allChats.some((chat) =>
+        chat.members.some((m) => m._id === user._id)
+      );
+      const matchesSearch =
+        searchKey && fullName.includes(searchKey.toLowerCase());
       return (
-        (searchKey && fullName.includes(searchKey.toLowerCase())) ||
-        allChats.some((chat) => chat.members?.includes(user._id))
+        user._id !== currentUser?._id && // No logger
+        (hasChat || (matchesSearch && !searchKey === false)) // Chats or search hits
       );
     })
     .map((user, index) => (
       <div
-        onClick={() => {
-          openChat(user._id);
-        }}
+        onClick={() => openChat(user._id)}
         className="user-search-filter"
         key={user._id || index}
       >
-        <div className="filtered-user">
+        <div
+          className={isSelectedChat(user) ? "selected-user" : "filtered-user"}
+        >
           <div className="filter-user-display">
             {user.profile ? (
               <img
@@ -125,7 +85,15 @@ const UserList = ({ searchKey }) => {
                 className="user-profile-image"
               />
             ) : (
-              <div className="user-default-profile-pic">{shortName(user)}</div>
+              <div
+                className={
+                  isSelectedChat(user)
+                    ? "user-selected-avatar"
+                    : "user-default-avatar"
+                }
+              >
+                {shortName(user)}
+              </div>
             )}
             <div className="filter-user-details">
               <div className="user-display-name">
@@ -135,8 +103,8 @@ const UserList = ({ searchKey }) => {
             </div>
             {!allChats.some(
               (chat) =>
-                chat.members?.includes(currentUser?._id) &&
-                chat.members?.includes(user._id)
+                chat.members.some((m) => m._id === currentUser?._id) &&
+                chat.members.some((m) => m._id === user._id)
             ) && (
               <div className="user-start-chat">
                 <button
