@@ -13,10 +13,10 @@ exports.newChat = asyncErrorHandler(async (req, res, next) => {
   }
 
   // logger should be on member
-  const currentUser = req.user._id.toString();
-  if (members.includes(currentUser)) {
-    return next(new customeError("you should be a member of the chat", 403));
-  }
+  // const currentUser = req.user._id.toString();
+  // if (members.includes(currentUser)) {
+  //   return next(new customeError("you should be a member of the chat", 403));
+  // }
 
   // Create and save chat
   const chat = new Chat({ members });
@@ -37,6 +37,7 @@ exports.newChat = asyncErrorHandler(async (req, res, next) => {
 
 exports.getAllChats = asyncErrorHandler(async (req, res, next) => {
   const chats = await Chat.find({ members: { $in: req.user._id } });
+
   if (!chats) {
     return next(new customeError("THERE IS NO CHAT", 404));
   }

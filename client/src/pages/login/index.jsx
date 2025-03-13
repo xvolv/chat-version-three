@@ -23,21 +23,15 @@ const Login = () => {
         localStorage.setItem("token", resData.token);
         window.location.href = "/";
       } else {
-        let errorMessage = "An unexpected error occurred.";
-        // Check if the error is related to the database
-        if (resData.message.includes("getaddrinfo ENOTFOUND")) {
-          errorMessage =
-            "Unable to connect to the server. Please check your network connection.";
-        } else {
-          errorMessage = resData.message || errorMessage;
-        }
-        console.log(resData);
+        let errorMessage = resData.message || "An unexpected error occurred.";
 
         toast.error(errorMessage);
       }
+
+      // Check if the error is related to the database
     } catch (error) {
       dispatch(hideLoader());
-      const res = "unexpected error occured, try again later please";
+      const res = "unexpected error occured,please try again later";
       console.log("it reached here,", error);
       toast.error(res);
     }

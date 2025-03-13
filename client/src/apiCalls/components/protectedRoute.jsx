@@ -10,10 +10,7 @@ import { getAllChats } from "../chat";
 
 const ProtectedRoute = ({ children }) => {
   const dispatch = useDispatch();
-  // const [user, setUser] = useState(null);
-  // const { user } = useSelector((state) => state.user.user);
   const navigate = useNavigate();
-
   const getLoggedInUser = async () => {
     let resData;
     try {
@@ -57,13 +54,6 @@ const ProtectedRoute = ({ children }) => {
     try {
       dispatch(showLoader());
       resData = await getAllChats();
-      console.log(
-        "---------------------------------------------------------------------------"
-      );
-      console.log("this is get all chat,", resData.chats);
-      console.log(
-        "---------------------------------------------------------------------------"
-      );
       dispatch(hideLoader());
       if (resData.status === "SUCCESS") {
         dispatch(setAllChats(resData.chats));
@@ -77,6 +67,33 @@ const ProtectedRoute = ({ children }) => {
       console.log(error);
     }
   };
+
+  // const getAllUserChat = async () => {
+  //   try {
+  //     dispatch(showLoader());
+  //     const resData = await getAllChats();
+  //     dispatch(hideLoader());
+  //     if (resData.status === "SUCCESS") {
+  //       // Static, don’t fuck up my new chats, just add what’s missing
+  //       dispatch(
+  //         setAllChats((oldChats) => [
+  //           ...oldChats,
+  //           ...resData.chats.filter(
+  //             (c) => !oldChats.some((oc) => oc._id === c._id)
+  //           ),
+  //         ])
+  //       );
+  //     } else {
+  //       toast.error(resData.message);
+  //       navigate("/login");
+  //     }
+  //   } catch (error) {
+  //     dispatch(hideLoader());
+  //     navigate("/login");
+  //     console.log(error);
+  //   }
+  // };
+
   useEffect(() => {
     if (localStorage.getItem("token")) {
       getLoggedInUser();

@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "./components/header";
 import Sidebar from "./components/siderBar";
+import ChatArea from "./components/chat";
 
 const Home = () => {
   return (
@@ -8,6 +9,7 @@ const Home = () => {
       <Header />
       <div className="main-content">
         <Sidebar />
+        <ChatArea />
       </div>
     </div>
   );
