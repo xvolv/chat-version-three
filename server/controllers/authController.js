@@ -81,7 +81,6 @@ exports.login = asyncErrorHandler(async (req, res, next) => {
 
 exports.getAllUsers = asyncErrorHandler(async (req, res, next) => {
   const users = await User.find({});
-  console.log(users);
   res.status(200).json({
     status: "SUCCESS",
     users,

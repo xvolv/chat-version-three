@@ -2,9 +2,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 const Header = () => {
-  const user = useSelector((state) => state.user.user);
+  const user = useSelector((state) => state.user?.user);
 
   function getFullName() {
+    if (!user) return "";
     let fName =
       user?.firstName.charAt(0).toUpperCase() +
       user?.firstName.slice(1).toLowerCase();
@@ -14,6 +15,7 @@ const Header = () => {
     return fName + " " + lName;
   }
   function shortName() {
+    if (!user) return "";
     let fName = user?.firstName.toUpperCase()[0];
     let lName = user?.lastName.charAt(0).toUpperCase()[0];
     return fName + lName;
