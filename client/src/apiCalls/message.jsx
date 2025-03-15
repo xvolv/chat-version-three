@@ -15,3 +15,18 @@ export const createNewMessage = async (message) => {
     throw error;
   }
 };
+
+export const getAllMessage = async (chatId) => {
+  try {
+    const response = await axiosInstance.get(
+      `api/message/chat-history/${chatId}`
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.data) {
+      return error.response.data;
+    }
+    throw error;
+  }
+};
