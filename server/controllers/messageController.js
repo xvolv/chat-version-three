@@ -19,7 +19,8 @@ exports.newMessage = asyncErrorHandler(async (req, res, next) => {
 
   res.status(201).json({
     status: "SUCCESS",
-    savedMessage,
+    message: "MESSAGE SENT SUCCESSFULLY",
+    data: savedMessage,
     currentChat,
   });
 
