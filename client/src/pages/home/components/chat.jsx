@@ -10,7 +10,7 @@ const ChatArea = () => {
   const dispatch = useDispatch();
   const selectedChat = useSelector((state) => state.user.selectedChat);
   const user = useSelector((state) => state.user.user);
-  console.log("Static, here’s your chat___*:", selectedChat); // What’s here?
+
   const selectedUser = selectedChat?.members.find((u) => u._id !== user._id);
 
   const sendMessage = async () => {
@@ -36,9 +36,10 @@ const ChatArea = () => {
     try {
       dispatch(showLoader());
       const resData = await getAllMessage(selectedChat?._id);
+      console.log(resData.allMessages, "this is resData.allMessages y'all");
       dispatch(hideLoader());
       if (resData.status === "SUCCESS") {
-        setAllMessage(resData);
+        setAllMessage(resData.allMessages);
       }
     } catch (error) {
       dispatch(hideLoader());
@@ -57,10 +58,31 @@ const ChatArea = () => {
             {selectedUser.firstName}
           </div>
           <div className="main-chat-area">
-            {/* <!--Chat Area--> */}
-            CHAT AREA
+            {allMessage.map((msg, i) => {
+              const isSenderMessage = msg.sender === user._id;
+
+              return (
+                <div
+                  key={i}
+                  className={"message-container"}
+                  style={
+                    isSenderMessage
+                      ? { justifyContent: "end" }
+                      : { justifyContent: "start" }
+                  }
+                >
+                  <div
+                    className={
+                      isSenderMessage ? "send-message" : "received-message"
+                    }
+                  >
+                    {msg.text}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div class="send-message-div">
+          <div className="send-message-div">
             <input
               type="text"
               className="send-message-input"

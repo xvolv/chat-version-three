@@ -353,7 +353,7 @@ i{
 ********************************************************/
 
 .app-chat-area{
-  background-color: rgb(104, 57, 57);
+  background-color: rgb(239, 248, 255);
   width: 70%;
   padding: 20px 30px;
   border-radius: 10px;
@@ -406,4 +406,29 @@ i{
   border:none;
   background-color: transparent;
   margin-top: 8px;
+}
+
+
+
+.message-container{
+  display: flex;
+}
+.send-message, .received-message{
+  padding: 10px 20px;
+  margin-top: 5px;
+  border-radius: 3px;
+  font-size: 14px;
+  width: fit-content;
+}
+
+.send-message{ 
+  background-color: #b82616;
+  color: white;
+  margin-left: 100px;
+}
+
+.received-message{ 
+  background-color: #ddd;
+  color: #28282B;
+  margin-right: 100px;
 }
