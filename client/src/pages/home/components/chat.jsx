@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createNewMessage, getAllMessage } from "../../../apiCalls/message";
 import { showLoader, hideLoader } from "./../../../redux/loaderSlice";
 import toast from "react-hot-toast";
+import moment from "moment";
 import { useEffect, useState } from "react";
 const ChatArea = () => {
   const [allMessage, setAllMessage] = useState([]);
@@ -71,12 +72,23 @@ const ChatArea = () => {
                       : { justifyContent: "start" }
                   }
                 >
-                  <div
-                    className={
-                      isSenderMessage ? "send-message" : "received-message"
-                    }
-                  >
-                    {msg.text}
+                  <div>
+                    <div
+                      className={
+                        isSenderMessage ? "send-message" : "received-message"
+                      }
+                    >
+                      {msg.text}
+                    </div>
+                    <div
+                      className={
+                        isSenderMessage
+                          ? "message-timestamp-sender"
+                          : "message-timestamp"
+                      }
+                    >
+                      {moment(msg.createdAt).format("hh:mm A")}
+                    </div>
                   </div>
                 </div>
               );
