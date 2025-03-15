@@ -1,19 +1,22 @@
 import { useDispatch, useSelector } from "react-redux";
-import { createNewMessage } from "../../../apiCalls/message";
+import { createNewMessage, getAllMessage } from "../../../apiCalls/message";
 import { showLoader, hideLoader } from "./../../../redux/loaderSlice";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const ChatArea = () => {
+  const [allMessage, setAllMessage] = useState([]);
+
   const [message, setMessage] = useState("");
   const dispatch = useDispatch();
   const selectedChat = useSelector((state) => state.user.selectedChat);
   const user = useSelector((state) => state.user.user);
   console.log("Static, here’s your chat___*:", selectedChat); // What’s here?
   const selectedUser = selectedChat?.members.find((u) => u._id !== user._id);
+
   const sendMessage = async () => {
     try {
       const newMessage = {
-        chat: selectedChat._id,
+        chatId: selectedChat._id,
         sender: user._id,
         text: message,
       };
@@ -28,6 +31,23 @@ const ChatArea = () => {
       toast.error(error.message);
     }
   };
+
+  const getMessages = async () => {
+    try {
+      dispatch(showLoader());
+      const resData = await getAllMessage(selectedChat?._id);
+      dispatch(hideLoader());
+      if (resData.status === "SUCCESS") {
+        setAllMessage(resData);
+      }
+    } catch (error) {
+      dispatch(hideLoader());
+      toast.error(error.message);
+    }
+  };
+  useEffect(() => {
+    getMessages();
+  }, [selectedChat]);
   return (
     <>
       {selectedChat && (

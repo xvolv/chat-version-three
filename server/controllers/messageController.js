@@ -34,8 +34,9 @@ exports.getAllMessage = asyncErrorHandler(async (req, res, next) => {
   const allMessages = await messageModel
     .find({ chatId: req.params.chatId })
     .sort({ createdAt: 1 });
+    
 
-  res.status(201).json({
+  res.status(200).json({
     status: "SUCCESS",
     allMessages,
   });
