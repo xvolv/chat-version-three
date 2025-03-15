@@ -54,6 +54,14 @@ const UserList = ({ searchKey }) => {
       dispatch(setSelectedChat(chat));
     }
   };
+  // const getLastMessage = (userId) => {
+  //   const chat = allChats.find((chat) =>
+  //     chat.members.map((m) => m._id).includes(userId)
+  //   );
+  //   // we are here 10:18 44
+
+  //   return chat ? chat?.lastMessage?.text?.substring(0, 25) : "";
+  // };
 
   return allUsers
     .filter((user) => {
@@ -99,7 +107,9 @@ const UserList = ({ searchKey }) => {
               <div className="user-display-name">
                 {user.firstName} {user.lastName}
               </div>
-              <div className="user-display-email">{user.email}</div>
+              <div className="user-display-email">
+                {getLastMessage(user._id) || user.email}
+              </div>
             </div>
             {!allChats.some(
               (chat) =>

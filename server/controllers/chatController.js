@@ -67,9 +67,10 @@ exports.newChat = asyncErrorHandler(async (req, res, next) => {
 });
 
 exports.getAllChats = asyncErrorHandler(async (req, res, next) => {
-  const chats = await Chat.find({ members: { $in: req.user._id } }).populate(
-    "members"
-  );
+  const chats = await Chat.find({ members: { $in: req.user._id } })
+    .populate("members")
+    .populate("lastMessage")
+    .sort({ updatedAt: -1 });
 
   if (!chats) {
     return next(new customeError("THERE IS NO CHAT", 404));
