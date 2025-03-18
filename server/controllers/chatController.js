@@ -1,6 +1,7 @@
 const Chat = require("./../models/chatModel");
 const asyncErrorHandler = require("./asyncErrorHandler");
 const customeError = require("./../utils/customeError");
+const messageModel = require("../models/messageModel");
 
 // exports.newChat = asyncErrorHandler(async (req, res, next) => {
 //   // Log input for debugging
@@ -78,5 +79,46 @@ exports.getAllChats = asyncErrorHandler(async (req, res, next) => {
   res.status(200).json({
     status: "SUCCESS",
     chats,
+  });
+});
+
+exports.clearUnreadMessage = asyncErrorHandler(async (req, res, next) => {
+  const chatId = req.body.chatId;
+
+  // Find the chat by ID
+  const chat = await Chat.findById(chatId);
+  if (!chat) {
+    return next(new customeError("THERE IS NO CHAT WITH THE chatId", 404));
+  }
+
+  // Update the unread message count in the chat collection
+  const updatedChat = await Chat.findByIdAndUpdate(
+    chatId,
+    { unreadMessageCount: 0 },
+    { new: true }
+  )
+    .populate("members")
+    .populate("lastMessage");
+
+  // Update the read property to true in the message collection
+  const updateResult = await messageModel.updateMany(
+    { chatId: chatId, read: false },
+    { read: true }
+  );
+
+  // Check if messages were updated
+  if (updateResult.nModified === 0) {
+    return res.status(200).json({
+      status: "SUCCESS",
+      message: "No unread messages were found to clear.",
+      data: updatedChat,
+    });
+  }
+
+  // Send a successful response
+  res.status(200).json({
+    status: "SUCCESS",
+    message: "UNREAD MESSAGE CLEARED SUCCESSFULLY",
+    data: updatedChat,
   });
 });

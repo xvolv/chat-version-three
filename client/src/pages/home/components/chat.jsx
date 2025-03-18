@@ -1,15 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
 import { createNewMessage, getAllMessage } from "../../../apiCalls/message";
 import { showLoader, hideLoader } from "./../../../redux/loaderSlice";
+import { clearUnreadMessageCount } from "./../../../apiCalls/chat";
 import toast from "react-hot-toast";
 import moment from "moment";
 import { useEffect, useState } from "react";
 const ChatArea = () => {
   const [allMessage, setAllMessage] = useState([]);
-
   const [message, setMessage] = useState("");
   const dispatch = useDispatch();
   const selectedChat = useSelector((state) => state.user.selectedChat);
+  const allChats = useSelector((state) => state.user.allChats);
+
   const user = useSelector((state) => state.user.user);
 
   const selectedUser = selectedChat?.members.find((u) => u._id !== user._id);
@@ -37,10 +39,31 @@ const ChatArea = () => {
     try {
       dispatch(showLoader());
       const resData = await getAllMessage(selectedChat?._id);
-      console.log(resData.allMessages, "this is resData.allMessages y'all");
+
       dispatch(hideLoader());
-      if (resData.status === "SUCCESS") {
+      if (resData?.status === "SUCCESS") {
         setAllMessage(resData.allMessages);
+      }
+    } catch (error) {
+      dispatch(hideLoader());
+      toast.error(error.message);
+    }
+  };
+  const clearUnreadMessageCounts = async () => {
+    try {
+      dispatch(showLoader());
+      const resData = await clearUnreadMessageCount(selectedChat?._id);
+      dispatch(hideLoader());
+      if (resData?.status === "SUCCESS") {
+        // all chat stateall
+        console.log(allChats, "this is all chats, why is this undefined");
+        allChats?.map((chat) => {
+          if (chat._id === selectedChat._id) {
+            return resData.data;
+          }
+
+          return chat;
+        });
       }
     } catch (error) {
       dispatch(hideLoader());
@@ -49,6 +72,7 @@ const ChatArea = () => {
   };
   useEffect(() => {
     getMessages();
+    clearUnreadMessageCounts();
   }, [selectedChat]);
   return (
     <>

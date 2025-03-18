@@ -3,8 +3,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { createNewChat } from "../../../apiCalls/chat";
 import { hideLoader, showLoader } from "../../../redux/loaderSlice";
 import { setAllChats, setSelectedChat } from "../../../redux/userSlice";
-
+// import moment from "moment";
 const UserList = ({ searchKey }) => {
+  // const getLastMessageTimeStamp = (userId) => {
+  //   const chat = allChats.find((chat) =>
+  //     chat.members.map((m) => m._id).includes(userId)
+  //   );
+  //   // we are here 10:18 44
+
+  //   return chat && chat.lastMessage
+  //     ? moment(chat.lastMessage.createdAt).format(" h:mm A")
+  //     : "";
+  // };
   const dispatch = useDispatch();
   const {
     user: currentUser = null,
@@ -54,14 +64,17 @@ const UserList = ({ searchKey }) => {
       dispatch(setSelectedChat(chat));
     }
   };
-  // const getLastMessage = (userId) => {
-  //   const chat = allChats.find((chat) =>
-  //     chat.members.map((m) => m._id).includes(userId)
-  //   );
-  //   // we are here 10:18 44
-
-  //   return chat ? chat?.lastMessage?.text?.substring(0, 25) : "";
-  // };
+  const getLastMessage = (userId) => {
+    const chat = allChats.find((chat) =>
+      chat.members.map((m) => m._id).includes(userId)
+    );
+    // we are here 10:18 44
+    const msgPrefix =
+      chat?.lastMessage?.sender === currentUser?._id ? "you : " : "";
+    return chat
+      ? msgPrefix + (chat.lastMessage?.text?.substring(0, 25) || "")
+      : "";
+  };
 
   return allUsers
     .filter((user) => {
@@ -105,12 +118,14 @@ const UserList = ({ searchKey }) => {
             )}
             <div className="filter-user-details">
               <div className="user-display-name">
-                {user.firstName} {user.lastName}
+                {user.firstName + " " + user.lastName}
               </div>
+
               <div className="user-display-email">
                 {getLastMessage(user._id) || user.email}
               </div>
             </div>
+            {/* <div>{getLastMessageTimeStamp(user._id)}</div> */}
             {!allChats.some(
               (chat) =>
                 chat.members.some((m) => m._id === currentUser?._id) &&

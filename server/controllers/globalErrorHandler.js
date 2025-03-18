@@ -7,12 +7,6 @@ const devError = (res, error) => {
   });
 };
 
-const prodError = (res, error) => {
-  res.status(error.statusCode || 500).json({
-    status: "FAIL",
-    message: error.message, // No need for default here either
-  });
-};
 
 const globalErrorHandler = (error, req, res, next) => {
   // Set defaults once

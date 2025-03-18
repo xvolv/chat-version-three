@@ -18,7 +18,10 @@ export const createNewMessage = async (message) => {
 
 export const getAllMessage = async (chatId) => {
   try {
-    const response = await axiosInstance.get(
+    if (!chatId) {
+      return;
+    }
+    let response = await axiosInstance.get(
       `api/message/chat-history/${chatId}`
     );
 
