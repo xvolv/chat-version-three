@@ -15,7 +15,9 @@ const UserList = ({ searchKey }) => {
   //     ? moment(chat.lastMessage.createdAt).format(" h:mm A")
   //     : "";
   // };
+
   const dispatch = useDispatch();
+
   const {
     user: currentUser = null,
     selectedChat = null,
@@ -32,6 +34,24 @@ const UserList = ({ searchKey }) => {
 
   const isSelectedChat = (user) => {
     return selectedChat?.members.some((m) => m._id === user._id) || false;
+  };
+  const getUnreadMessageCount = (userId) => {
+    // loop over the chat
+    const chat = allChats.find((chat) =>
+      chat.members.map((u) => u._id).includes(userId)
+    );
+    if (
+      chat &&
+      chat.unreadMessageCount &&
+      chat.lastMessage.sender !== currentUser._id
+    ) {
+      return (
+        <div className="unread-message-counter">{chat.unreadMessageCount}</div>
+      );
+      // chat.unreadMessageCount;
+    } else {
+      return "";
+    }
   };
 
   const startNewChat = async (searchedUserId) => {
@@ -124,6 +144,9 @@ const UserList = ({ searchKey }) => {
               <div className="user-display-email">
                 {getLastMessage(user._id) || user.email}
               </div>
+              {/* <div className="unread-message-counter"> */}
+              {getUnreadMessageCount(user._id)}
+              {/* </div> */}
             </div>
             {/* <div>{getLastMessageTimeStamp(user._id)}</div> */}
             {!allChats.some(

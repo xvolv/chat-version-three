@@ -55,8 +55,8 @@ const ProtectedRoute = ({ children }) => {
       dispatch(showLoader());
       resData = await getAllChats();
       dispatch(hideLoader());
-      if (resData.status === "SUCCESS") {
-        console.log("and this are the chats", resData.chats[0].members[1]);
+      if (resData?.status === "SUCCESS") {
+        console.log("and this are the chats", resData?.chats[0]?.members[1]);
         dispatch(setAllChats(resData.chats));
       } else {
         toast.error(resData.message);
