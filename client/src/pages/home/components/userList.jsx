@@ -3,19 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { createNewChat } from "../../../apiCalls/chat";
 import { hideLoader, showLoader } from "../../../redux/loaderSlice";
 import { setAllChats, setSelectedChat } from "../../../redux/userSlice";
-// import moment from "moment";
+import moment from "moment";
+import {
+  setMessages,
+  updateMessageReadStatus,
+} from "../../../redux/messageSlicer";
+
 const UserList = ({ searchKey }) => {
-  // const getLastMessageTimeStamp = (userId) => {
-  //   const chat = allChats.find((chat) =>
-  //     chat.members.map((m) => m._id).includes(userId)
-  //   );
-  //   // we are here 10:18 44
-
-  //   return chat && chat.lastMessage
-  //     ? moment(chat.lastMessage.createdAt).format(" h:mm A")
-  //     : "";
-  // };
-
   const dispatch = useDispatch();
 
   const {
@@ -23,7 +17,17 @@ const UserList = ({ searchKey }) => {
     selectedChat = null,
     allUsers = [],
     allChats = [],
-  } = useSelector((state) => state.user) || {};
+  } = useSelector((state) => state.user);
+
+  const getLastMessageTimeStamp = (userId) => {
+    const chat = allChats.find((chat) =>
+      chat.members.map((m) => m._id).includes(userId)
+    );
+
+    return chat && chat.lastMessage
+      ? moment(chat.lastMessage.createdAt).format("h:mm A")
+      : "";
+  };
 
   const shortName = (user) => {
     return (
@@ -35,11 +39,12 @@ const UserList = ({ searchKey }) => {
   const isSelectedChat = (user) => {
     return selectedChat?.members.some((m) => m._id === user._id) || false;
   };
+
   const getUnreadMessageCount = (userId) => {
-    // loop over the chat
     const chat = allChats.find((chat) =>
       chat.members.map((u) => u._id).includes(userId)
     );
+
     if (
       chat &&
       chat.unreadMessageCount &&
@@ -48,7 +53,6 @@ const UserList = ({ searchKey }) => {
       return (
         <div className="unread-message-counter">{chat.unreadMessageCount}</div>
       );
-      // chat.unreadMessageCount;
     } else {
       return "";
     }
@@ -63,14 +67,15 @@ const UserList = ({ searchKey }) => {
       if (resData.status === "SUCCESS") {
         toast.success(resData.message);
         const newChat = resData.chat || resData;
-        const updateChat = [...allChats, newChat];
-        dispatch(setAllChats(updateChat));
+        const updatedChats = [...allChats, newChat];
+        dispatch(setAllChats(updatedChats));
         dispatch(setSelectedChat(newChat));
+        dispatch(setMessages(newChat.messages)); // Set messages for the new chat
       }
     } catch (error) {
       dispatch(hideLoader());
       toast.error(resData?.message || "Failed to start chat");
-      console.log(error, "Static, chat creation fucked up");
+      console.log(error);
     }
   };
 
@@ -82,19 +87,43 @@ const UserList = ({ searchKey }) => {
     );
     if (chat) {
       dispatch(setSelectedChat(chat));
+      dispatch(setMessages(chat.messages)); // Set messages when opening a chat
+
+      // Update the read status of all unread messages sent by the other user
+      chat.messages.forEach((message) => {
+        if (!message.read && message.sender !== currentUser._id) {
+          dispatch(
+            updateMessageReadStatus({ messageId: message._id, status: true })
+          );
+        }
+      });
     }
   };
+
   const getLastMessage = (userId) => {
     const chat = allChats.find((chat) =>
       chat.members.map((m) => m._id).includes(userId)
     );
-    // we are here 10:18 44
+
     const msgPrefix =
-      chat?.lastMessage?.sender === currentUser?._id ? "you : " : "";
+      chat?.lastMessage?.sender === currentUser?._id ? "you: " : "";
     return chat
       ? msgPrefix + (chat.lastMessage?.text?.substring(0, 25) || "")
       : "";
   };
+
+  function getData() {
+    if (searchKey === "") {
+      return allChats;
+    } else {
+      return allUsers.filter((user) => {
+        return (
+          user.firstname?.toLowerCase().includes(searchKey?.toLowerCase()) ||
+          user.lastname?.toLowerCase().includes(searchKey?.toLowerCase())
+        );
+      });
+    }
+  }
 
   return allUsers
     .filter((user) => {
@@ -105,7 +134,7 @@ const UserList = ({ searchKey }) => {
       const matchesSearch =
         searchKey && fullName.includes(searchKey.toLowerCase());
       return (
-        user._id !== currentUser?._id && // No logger
+        user._id !== currentUser?._id && // No logged-in user
         (hasChat || (matchesSearch && !searchKey === false)) // Chats or search hits
       );
     })
@@ -144,11 +173,21 @@ const UserList = ({ searchKey }) => {
               <div className="user-display-email">
                 {getLastMessage(user._id) || user.email}
               </div>
-              {/* <div className="unread-message-counter"> */}
-              {getUnreadMessageCount(user._id)}
-              {/* </div> */}
             </div>
-            {/* <div>{getLastMessageTimeStamp(user._id)}</div> */}
+            <div>
+              <div>
+                {getLastMessageTimeStamp(user._id)}
+                {/* Display check circle if the message is read */}
+                {/* {selectedChat?.lastMessage?.sender === currentUser?._id && (
+                  <i
+                    className="fa fa-check-circle"
+                    aria-hidden="true"
+                    style={{ color: "cyan" }}
+                  ></i>
+                )} */}
+              </div>
+              <div> {getUnreadMessageCount(user._id)}</div>
+            </div>
             {!allChats.some(
               (chat) =>
                 chat.members.some((m) => m._id === currentUser?._id) &&
